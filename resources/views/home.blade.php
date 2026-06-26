@@ -5,7 +5,7 @@
 @section('content')
     <!-- Hero Section -->
     <section class="hero">
-        <span class="hero-badge">Toll station </span>
+        <span class="hero-badge">Toll station platform</span>
         <h1 class="hero-title">Automated <span>Toll Management</span> System</h1>
         <p class="hero-subtitle">
             A scalable and secure toll station platform with automated operations, detailed audit logging, and role-based access control to ensure efficient and reliable management.
