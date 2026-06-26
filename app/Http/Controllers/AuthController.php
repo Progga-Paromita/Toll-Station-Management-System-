@@ -207,4 +207,79 @@ class AuthController extends Controller
 
         return redirect('/')->with('success', 'Logged out successfully!');
     }
+
+    /**
+     * Show the Forgot Password form.
+     */
+    public function showForgotPassword()
+    {
+        return view('auth.forgot-password');
+    }
+
+    /**
+     * Handle Forgot Password — reset password by verifying username + email.
+     */
+    public function forgotPassword(Request $request)
+    {
+        $request->validate([
+            'username'     => 'required|string',
+            'email'        => 'required|email',
+            'new_password' => 'required|string|min:6|confirmed',
+        ]);
+
+        // Find user matching BOTH username and email
+        $userRecord = DB::selectOne("
+            SELECT * FROM users
+            WHERE username = :username
+              AND LOWER(email) = LOWER(:email)
+        ", [
+            'username' => $request->input('username'),
+            'email'    => $request->input('email'),
+        ]);
+
+        if (!$userRecord) {
+            return back()
+                ->withErrors(['username' => 'No account matched with those credentials. Please check your username and email.'])
+                ->withInput();
+        }
+
+        // Update the password
+        DB::update("
+            UPDATE users SET password = :password WHERE user_id = :user_id
+        ", [
+            'password' => Hash::make($request->input('new_password')),
+            'user_id'  => $userRecord->user_id,
+        ]);
+
+        return redirect()->route('login')
+            ->with('success', 'Password reset successfully! You can now log in with your new password.');
+    }
+
+    /**
+     * Handle Change Password for authenticated users.
+     */
+    public function changePassword(Request $request)
+    {
+        $request->validate([
+            'current_password' => 'required|string',
+            'new_password'     => 'required|string|min:6|confirmed',
+        ]);
+
+        $user = Auth::user();
+
+        // Verify current password
+        if (!Hash::check($request->input('current_password'), $user->password)) {
+            return back()->withErrors(['current_password' => 'Current password is incorrect.'])->withInput();
+        }
+
+        // Update password in DB
+        DB::update("
+            UPDATE users SET password = :password WHERE user_id = :user_id
+        ", [
+            'password' => Hash::make($request->input('new_password')),
+            'user_id'  => $user->user_id,
+        ]);
+
+        return back()->with('success', 'Password changed successfully!');
+    }
 }

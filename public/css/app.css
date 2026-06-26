@@ -740,3 +740,121 @@ tr:hover td {
         gap: 16px;
     }
 }
+
+/* ── User Dropdown Menu ──────────────────────────────────── */
+.user-menu {
+    position: relative;
+}
+
+.user-dropdown {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    min-width: 220px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-lg);
+    z-index: 200;
+    overflow: hidden;
+
+    /* Hidden by default */
+    opacity: 0;
+    transform: translateY(-8px) scale(0.97);
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.user-dropdown.open {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+}
+
+.dropdown-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background: linear-gradient(135deg, var(--primary-glow), transparent);
+}
+
+.dropdown-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 800;
+    flex-shrink: 0;
+}
+
+.dropdown-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 140px;
+}
+
+.dropdown-role {
+    margin-top: 4px;
+}
+
+.dropdown-divider {
+    height: 1px;
+    background-color: var(--border-color);
+    margin: 0;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: background-color var(--transition-speed), color var(--transition-speed);
+    background: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+    font-family: var(--font-sans);
+    text-decoration: none;
+}
+
+.dropdown-item:hover {
+    background-color: var(--bg-tertiary);
+    color: var(--primary);
+}
+
+.dropdown-item svg {
+    flex-shrink: 0;
+    opacity: 0.7;
+}
+
+.dropdown-item:hover svg {
+    opacity: 1;
+}
+
+.dropdown-item-danger {
+    color: var(--danger);
+}
+
+.dropdown-item-danger:hover {
+    background-color: rgba(239, 68, 68, 0.08);
+    color: var(--danger);
+}
+
+/* ── Change Password Card ────────────────────────────────── */
+.change-password-card {
+    scroll-margin-top: 100px;
+}

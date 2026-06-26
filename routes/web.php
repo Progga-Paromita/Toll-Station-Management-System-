@@ -14,12 +14,16 @@ Route::middleware('guest')->group(function () {
     
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [AuthController::class, 'register']);
+
+    Route::get('/forgot-password', [AuthController::class, 'showForgotPassword'])->name('password.request');
+    Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])->name('password.forgot');
 });
 
 // Authenticated Routes
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/profile', [AuthController::class, 'profile'])->name('profile');
+    Route::post('/change-password', [AuthController::class, 'changePassword'])->name('password.change');
 
     // Operator / Member Routes
     Route::get('/operator/dashboard', [TollController::class, 'operatorDashboard'])->name('operator.dashboard');

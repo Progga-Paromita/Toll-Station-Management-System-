@@ -46,9 +46,12 @@
                     <input type="text" name="username" id="username" class="form-control" placeholder="Enter your username or email" value="{{ old('username') }}" required autofocus autocomplete="username">
                 </div>
 
-                <div class="form-group" style="margin-bottom: 28px;">
-                    <label for="password" class="form-label">Password</label>
-                    <input type="password" name="password" id="password" class="form-control" placeholder="Enter secure password" required>
+                <div class="form-group" style="margin-bottom: 8px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <label for="password" class="form-label" style="margin-bottom: 0;">Password</label>
+                        <a href="{{ route('password.request') }}" style="font-size: 12px; color: var(--primary); font-weight: 600;">Forgot password?</a>
+                    </div>
+                    <input type="password" name="password" id="password" class="form-control" placeholder="Enter secure password" required style="margin-bottom: 20px;">
                 </div>
 
                 <button type="submit" class="btn btn-primary" style="width: 100%;">
