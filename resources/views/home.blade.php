@@ -10,7 +10,6 @@
         <p class="hero-subtitle">
             A scalable and secure toll station platform with automated operations, detailed audit logging, and role-based access control to ensure efficient and reliable management.
         </p>
-
         @guest
             <div style="display:flex; justify-content:center; gap:16px;">
                 <a href="{{ route('login', ['role' => 'operator']) }}" class="btn btn-primary">Member Gate</a>

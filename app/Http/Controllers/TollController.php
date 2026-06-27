@@ -15,6 +15,8 @@ class TollController extends Controller
     private $rates = [
         'Bike' => 50.00,
         'Car' => 100.00,
+        'Microbus' => 150.00,
+        'Ambulance' => 80.00,
         'Bus' => 250.00,
         'Truck' => 350.00,
     ];
@@ -84,23 +86,60 @@ class TollController extends Controller
 
         $request->validate([
             'vehicle_number' => 'required|string|max:20',
-            'vehicle_type' => 'required|string|in:Bike,Car,Bus,Truck',
+            'vehicle_type' => 'required|string|in:Bike,Car,Bus,Truck,Microbus,Ambulance',
             'payment_method' => 'required|string|in:Cash,Card,RFID',
         ]);
 
+        $vehicleNumber = strtoupper(str_replace(' ', '-', $request->input('vehicle_number')));
         $vehicleType = $request->input('vehicle_type');
         $tollAmount = $this->rates[$vehicleType];
 
-        // Oracle INSERT Query
+        // 1. Vehicle Verification or Auto-Registration
+        $vehicle = DB::selectOne("
+            SELECT vehicle_id, status 
+            FROM vehicles 
+            WHERE registration_number = :reg_num
+        ", ['reg_num' => $vehicleNumber]);
+
+        if ($vehicle) {
+            // Blocked vehicles are rejected
+            if ($vehicle->status === 'BLOCKED') {
+                return redirect()->back()->withInput()->with('error', "Vehicle {$vehicleNumber} is BLOCKED and cannot pass the toll station.");
+            }
+            $vehicleId = $vehicle->vehicle_id;
+        } else {
+            // Register vehicle automatically
+            $vehicleId = DB::selectOne("SELECT vehicles_seq.NEXTVAL AS val FROM dual")->val;
+            
+            DB::insert("
+                INSERT INTO vehicles (
+                    vehicle_id, registration_number, owner_name, owner_phone,
+                    vehicle_type, color, manufacturer, model, weight, registration_date, status, created_by, created_at
+                )
+                VALUES (
+                    :vehicle_id, :reg_num, 'Auto-Registered', 'N/A',
+                    :vehicle_type, 'Unknown', 'N/A', 'N/A', :weight, SYSDATE, 'ACTIVE', :created_by, SYSDATE
+                )
+            ", [
+                'vehicle_id'          => $vehicleId,
+                'reg_num'             => $vehicleNumber,
+                'vehicle_type'        => strtoupper($vehicleType),
+                'weight'              => 1500.00,
+                'created_by'          => $user->user_id,
+            ]);
+        }
+
+        // 2. Insert Toll Transaction linking to vehicle_id
         DB::insert("
-            INSERT INTO toll_transactions (vehicle_number, vehicle_type, toll_amount, payment_method, operator_id, created_at)
-            VALUES (:vehicle_number, :vehicle_type, :toll_amount, :payment_method, :operator_id, SYSDATE)
+            INSERT INTO toll_transactions (vehicle_number, vehicle_type, toll_amount, payment_method, operator_id, vehicle_id, created_at)
+            VALUES (:vehicle_number, :vehicle_type, :toll_amount, :payment_method, :operator_id, :vehicle_id, SYSDATE)
         ", [
-            'vehicle_number' => strtoupper($request->input('vehicle_number')),
-            'vehicle_type' => $vehicleType,
-            'toll_amount' => $tollAmount,
+            'vehicle_number' => $vehicleNumber,
+            'vehicle_type'   => $vehicleType,
+            'toll_amount'    => $tollAmount,
             'payment_method' => $request->input('payment_method'),
-            'operator_id' => $user->user_id,
+            'operator_id'    => $user->user_id,
+            'vehicle_id'     => $vehicleId,
         ]);
 
         return redirect()->route('operator.dashboard')->with('success', 'Toll transaction registered successfully!');

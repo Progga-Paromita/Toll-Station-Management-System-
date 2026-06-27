@@ -37,9 +37,13 @@
                     @if(Auth::user()->isAdmin())
                         <a href="{{ route('admin.dashboard') }}" class="nav-link {{ Route::is('admin.dashboard') ? 'active' : '' }}">Dashboard</a>
                         <a href="{{ route('admin.stations.index') }}" class="nav-link {{ Route::is('admin.stations.*') ? 'active' : '' }}">Toll Stations</a>
+                        <a href="{{ route('vehicles.index') }}" class="nav-link {{ Route::is('vehicles.*') ? 'active' : '' }}">Vehicles</a>
                         <a href="{{ route('admin.playground') }}" class="nav-link {{ Route::is('admin.playground') ? 'active' : '' }}">PL/SQL Lab</a>
                     @elseif(Auth::user()->isOperator())
                         <a href="{{ route('operator.dashboard') }}" class="nav-link {{ Route::is('operator.dashboard') ? 'active' : '' }}">Member Panel</a>
+                        <a href="{{ route('vehicles.index') }}" class="nav-link {{ Route::is('vehicles.*') ? 'active' : '' }}">Vehicles</a>
+                    @elseif(Auth::user()->isViewer())
+                        <a href="{{ route('vehicles.index') }}" class="nav-link {{ Route::is('vehicles.*') ? 'active' : '' }}">Vehicles</a>
                     @endif
                 @endauth
             </div>

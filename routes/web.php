@@ -65,4 +65,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/stations/{id}/edit',    [TollStationController::class, 'edit'])   ->name('admin.stations.edit');
     Route::put('/admin/stations/{id}',         [TollStationController::class, 'update']) ->name('admin.stations.update');
     Route::delete('/admin/stations/{id}',      [TollStationController::class, 'destroy'])->name('admin.stations.destroy');
+
+    // ── Vehicle Management (Multi-Role Access) ──────────────────────
+    Route::get('/vehicles',                    [App\Http\Controllers\VehicleController::class, 'index'])  ->name('vehicles.index');
+    Route::get('/vehicles/report',             [App\Http\Controllers\VehicleController::class, 'report']) ->name('vehicles.report');
+    Route::get('/vehicles/create',             [App\Http\Controllers\VehicleController::class, 'create']) ->name('vehicles.create');
+    Route::post('/vehicles',                   [App\Http\Controllers\VehicleController::class, 'store'])  ->name('vehicles.store');
+    Route::get('/vehicles/{id}',               [App\Http\Controllers\VehicleController::class, 'show'])   ->name('vehicles.show');
+    Route::get('/vehicles/{id}/edit',          [App\Http\Controllers\VehicleController::class, 'edit'])   ->name('vehicles.edit');
+    Route::put('/vehicles/{id}',               [App\Http\Controllers\VehicleController::class, 'update']) ->name('vehicles.update');
+    Route::delete('/vehicles/{id}',            [App\Http\Controllers\VehicleController::class, 'destroy'])->name('vehicles.destroy');
 });

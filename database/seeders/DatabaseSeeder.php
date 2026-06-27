@@ -19,7 +19,9 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // ── Purge existing data in reverse FK order ───────────────────────────
+        DB::statement('UPDATE toll_stations SET created_by = NULL');
         DB::statement('DELETE FROM toll_transactions');
+        DB::statement('DELETE FROM vehicles');
         DB::statement('DELETE FROM login_logs');
         DB::statement('DELETE FROM users');
         DB::statement('DELETE FROM roles');
@@ -89,8 +91,122 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // Retrieve auto-generated user IDs
+        $adminId = DB::table('users')->where('username', 'admin')->value('user_id');
         $johnId = DB::table('users')->where('username', 'john')->value('user_id');
         $janeId = DB::table('users')->where('username', 'jane')->value('user_id');
+
+        // Re-associate toll stations with the seeded admin user
+        DB::statement('UPDATE toll_stations SET created_by = :admin_id', ['admin_id' => $adminId]);
+
+        // ─────────────────────────────────────────────────────────────────────
+        // 2.5 VEHICLES (Master Data)
+        // ─────────────────────────────────────────────────────────────────────
+        DB::table('vehicles')->insert([
+            [
+                'registration_number' => 'DHK-12-3456',
+                'owner_name'          => 'Karim Rahman',
+                'owner_phone'         => '01711223344',
+                'vehicle_type'        => 'CAR',
+                'color'               => 'Black',
+                'manufacturer'        => 'Toyota',
+                'model'               => 'Premio',
+                'weight'              => 1500,
+                'registration_date'   => now()->subMonths(6),
+                'status'              => 'ACTIVE',
+                'created_by'          => $adminId,
+                'created_at'          => now()->subMonths(6),
+            ],
+            [
+                'registration_number' => 'CTG-98-7654',
+                'owner_name'          => 'Rahim Transport Ltd.',
+                'owner_phone'         => '01822334455',
+                'vehicle_type'        => 'TRUCK',
+                'color'               => 'Blue',
+                'manufacturer'        => 'Tata',
+                'model'               => 'LPT 1615',
+                'weight'              => 8500,
+                'registration_date'   => now()->subMonths(12),
+                'status'              => 'ACTIVE',
+                'created_by'          => $adminId,
+                'created_at'          => now()->subMonths(12),
+            ],
+            [
+                'registration_number' => 'SYL-11-2233',
+                'owner_name'          => 'Sajjad Hosen',
+                'owner_phone'         => '01933445566',
+                'vehicle_type'        => 'BIKE',
+                'color'               => 'Red',
+                'manufacturer'        => 'Yamaha',
+                'model'               => 'FZ-S',
+                'weight'              => 135,
+                'registration_date'   => now()->subMonths(3),
+                'status'              => 'ACTIVE',
+                'created_by'          => $adminId,
+                'created_at'          => now()->subMonths(3),
+            ],
+            [
+                'registration_number' => 'RAJ-55-6677',
+                'owner_name'          => 'Hanif Enterprise',
+                'owner_phone'         => '01544556677',
+                'vehicle_type'        => 'BUS',
+                'color'               => 'Green',
+                'manufacturer'        => 'Hino',
+                'model'               => 'AK1J',
+                'weight'              => 11000,
+                'registration_date'   => now()->subMonths(8),
+                'status'              => 'ACTIVE',
+                'created_by'          => $adminId,
+                'created_at'          => now()->subMonths(8),
+            ],
+            [
+                'registration_number' => 'DHK-99-9999',
+                'owner_name'          => 'Selim Reza',
+                'owner_phone'         => '01355667788',
+                'vehicle_type'        => 'MICROBUS',
+                'color'               => 'Silver',
+                'manufacturer'        => 'Toyota',
+                'model'               => 'HiAce',
+                'weight'              => 2200,
+                'registration_date'   => now()->subMonths(4),
+                'status'              => 'BLOCKED',
+                'created_by'          => $adminId,
+                'created_at'          => now()->subMonths(4),
+            ],
+            [
+                'registration_number' => 'DHK-00-1122',
+                'owner_name'          => 'Square Hospital',
+                'owner_phone'         => '01766778899',
+                'vehicle_type'        => 'AMBULANCE',
+                'color'               => 'White',
+                'manufacturer'        => 'Hyundai',
+                'model'               => 'H1',
+                'weight'              => 2400,
+                'registration_date'   => now()->subMonths(2),
+                'status'              => 'ACTIVE',
+                'created_by'          => $adminId,
+                'created_at'          => now()->subMonths(2),
+            ],
+            [
+                'registration_number' => 'DHK-88-8888',
+                'owner_name'          => 'Nabil Hasan',
+                'owner_phone'         => '01877889900',
+                'vehicle_type'        => 'CAR',
+                'color'               => 'Grey',
+                'manufacturer'        => 'Honda',
+                'model'               => 'Civic',
+                'weight'              => 1400,
+                'registration_date'   => now()->subMonths(1),
+                'status'              => 'EXPIRED',
+                'created_by'          => $adminId,
+                'created_at'          => now()->subMonths(1),
+            ],
+        ]);
+
+        // Fetch vehicle IDs
+        $carId       = DB::table('vehicles')->where('registration_number', 'DHK-12-3456')->value('vehicle_id');
+        $truckId     = DB::table('vehicles')->where('registration_number', 'CTG-98-7654')->value('vehicle_id');
+        $bikeId      = DB::table('vehicles')->where('registration_number', 'SYL-11-2233')->value('vehicle_id');
+        $busId       = DB::table('vehicles')->where('registration_number', 'RAJ-55-6677')->value('vehicle_id');
 
         // ─────────────────────────────────────────────────────────────────────
         // 3. SAMPLE TOLL TRANSACTIONS
@@ -102,6 +218,7 @@ class DatabaseSeeder extends Seeder
                 'toll_amount'    => 100.00,
                 'payment_method' => 'Cash',
                 'operator_id'    => $johnId,
+                'vehicle_id'     => $carId,
                 'created_at'     => now()->subMinutes(30),
             ],
             [
@@ -110,6 +227,7 @@ class DatabaseSeeder extends Seeder
                 'toll_amount'    => 350.00,
                 'payment_method' => 'Card',
                 'operator_id'    => $johnId,
+                'vehicle_id'     => $truckId,
                 'created_at'     => now()->subMinutes(20),
             ],
             [
@@ -118,6 +236,7 @@ class DatabaseSeeder extends Seeder
                 'toll_amount'    => 50.00,
                 'payment_method' => 'RFID',
                 'operator_id'    => $janeId,
+                'vehicle_id'     => $bikeId,
                 'created_at'     => now()->subMinutes(15),
             ],
             [
@@ -126,6 +245,7 @@ class DatabaseSeeder extends Seeder
                 'toll_amount'    => 250.00,
                 'payment_method' => 'Cash',
                 'operator_id'    => $johnId,
+                'vehicle_id'     => $busId,
                 'created_at'     => now()->subMinutes(5),
             ],
         ]);

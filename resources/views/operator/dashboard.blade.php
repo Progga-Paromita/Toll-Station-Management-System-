@@ -42,6 +42,8 @@
                             <option value="Bike">Bike</option>
                             <option value="Bus">Bus</option>
                             <option value="Truck">Truck</option>
+                            <option value="Microbus">Microbus</option>
+                            <option value="Ambulance">Ambulance</option>
                         </select>
                     </div>
 
@@ -128,7 +130,9 @@
             'Car': '100.00',
             'Bike': '50.00',
             'Bus': '250.00',
-            'Truck': '350.00'
+            'Truck': '350.00',
+            'Microbus': '150.00',
+            'Ambulance': '80.00'
         };
 
         function updateRate() {
